@@ -73,3 +73,4 @@ public class WaveSpawner : MonoBehaviour
         return baseCount + (wave - 1) * extraPerWave;
     }
 }
+// US-02: waves from 4 directions, +2 enemies per wave
