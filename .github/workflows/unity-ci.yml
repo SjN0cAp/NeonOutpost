@@ -1,0 +1,59 @@
+name: Unity CI
+
+on:
+  push:
+    branches: [ main, develop, "feature/**" ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+  UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+
+jobs:
+  test:
+    name: Run EditMode tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: true }
+
+      - uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: Library-
+
+      - name: Run tests
+        uses: game-ci/unity-test-runner@v4
+        with:
+          unityVersion: 6000.5.10f1
+          testMode: editmode
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    name: Build Windows
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: true }
+
+      - uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: Library-
+
+      - name: Build
+        uses: game-ci/unity-builder@v4
+        with:
+          unityVersion: 6000.5.10f1
+          targetPlatform: StandaloneWindows64
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: NeonOutpost-Windows
+          path: build/StandaloneWindows64
