@@ -64,3 +64,4 @@ public class EnemyChase : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, loseRange);
     }
 }
+// US-03: enemy chase feature (detect 5, speed 3, lose 10)
